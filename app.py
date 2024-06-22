@@ -9,8 +9,8 @@ from PIL import Image
 import glob
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'static/uploads'
-COMPRESSED_FOLDER = 'static/compressed'
+UPLOAD_FOLDER = '/tmp/static/uploads'
+COMPRESSED_FOLDER = '/tmp/static/compressed'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['COMPRESSED_FOLDER'] = COMPRESSED_FOLDER
 
