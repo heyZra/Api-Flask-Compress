@@ -16,19 +16,20 @@ app.config['COMPRESSED_FOLDER'] = COMPRESSED_FOLDER
 
 # Explicitly set the path to ffmpeg
 # os.environ["PATH"] += os.pathsep + r"C:\ffmpeg\bin"  # Update this path to your actual ffmpeg.exe path
-os.environ["PATH"] += os.pathsep + r"C:\Program Files\ffmpeg\bin"  # Update this path to your actual ffmpeg.exe path
+# os.environ["PATH"] += os.pathsep + r"C:\Program Files\ffmpeg\bin"  # Update this path to your actual ffmpeg.exe path
+os.environ["PATH"] += os.pathsep + r"usr\bin\ffmpeg"  # Update this path to your actual ffmpeg.exe path
 
-def clear_folder(folder_path):
-    files = glob.glob(os.path.join(folder_path, '*'))
-    for f in files:
-        os.remove(f)
+# def clear_folder(folder_path):
+#     files = glob.glob(os.path.join(folder_path, '*'))
+#     for f in files:
+#         os.remove(f)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         # Clear previous files
-        clear_folder(app.config['UPLOAD_FOLDER'])
-        clear_folder(app.config['COMPRESSED_FOLDER'])
+        # clear_folder(app.config['UPLOAD_FOLDER'])
+        # clear_folder(app.config['COMPRESSED_FOLDER'])
 
         if 'file' not in request.files:
             return 'No file part'
@@ -37,7 +38,9 @@ def index():
             return 'No selected file'
         compression_type = request.form.get('compression_type')
         if file:
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            extension_file = os.path.splitext(file.filename)[1].lower()
+            # file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'original'+extension_file)
             file.save(file_path)
             
             # Perform compression
@@ -66,7 +69,7 @@ def compress_file(file_path, compression_type):
     
 def compress_image(file_path):
     file_name = os.path.basename(file_path)  # Get the file name
-    nameCompressed = f'compressed_{os.path.splitext(file_name)[0].lower()}.jpeg'
+    nameCompressed = 'compressed.jpeg'
     file_extension = os.path.splitext(file_name)[1].lower()
     compressed_image_path = os.path.join(app.config['COMPRESSED_FOLDER'], nameCompressed)
     
@@ -96,7 +99,7 @@ def compress_to_mp3(file_path):
     file_extension = file_extension.lower()
 
     # Menyiapkan nama file untuk file terkompresi
-    name_compressed = f'compressed_{file_name.lower()}'
+    name_compressed = f'compressed'
     compressed_mp3_path = os.path.join(app.config['COMPRESSED_FOLDER'], name_compressed + ".mp3")
     compressed_wav_path = os.path.join(app.config['COMPRESSED_FOLDER'], name_compressed + ".wav")
 
@@ -143,7 +146,7 @@ def compress_to_mp3(file_path):
     # Siapkan objek JSON untuk respons
     json_obj = {
         "url": [f"/static/compressed/{name_compressed}.mp3", f"/static/compressed/{name_compressed}.wav"],
-        "originalName": [file_name, f'{file_name}.wav'],
+        "originalName": [f'{file_name}.mp3', f'{file_name}.wav'],
         "originalSize": [round(original_size_mp3,2), round(original_size_wav,2)],
         "compressedName": [f"{name_compressed}.mp3", f"{name_compressed}.wav"],
         "compressedSize": [round(compressed_size_mp3,2), round(compressed_size_wav,2)],
